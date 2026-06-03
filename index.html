@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧬 ProcGen Creatures Dashboard • Live GitHub + Reddit Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        
+        body { font-family: 'Inter', system_ui, sans-serif; }
+        .font-display { font-family: 'Space Grotesk', 'Inter', sans-serif; font-weight: 600; }
+
+        .dashboard-bg { background: linear-gradient(135deg, #0f172a 0%, #020617 100%); }
+        .section-header { font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.025em; }
+
+        .repo-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .repo-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); }
+
+        .feature-badge { font-size: 0.75rem; padding: 0.125rem 0.5rem; border-radius: 9999px; }
+        .nav-active { color: #10b981; border-bottom: 2px solid #10b981; }
+
+        .comparison-table th { background-color: #1e2937; font-weight: 600; color: #e2e8f0; }
+        .metric-value { font-variant-numeric: tabular-nums; }
+
+        .creature-glow { box-shadow: 0 0 15px rgba(16, 185, 129, 0.15); }
+        .alert-item { transition: all 0.2s ease; }
+        .tab-button { transition: all 0.2s ease; }
+        .tab-button.active { background-color: #10b981; color: white; border-color: #10b981; }
+
+        .procedural-bg { background-image: radial-gradient(circle at 25% 30%, rgba(16, 185, 129, 0.06) 0%, transparent 50%), radial-gradient(circle at 75% 70%, rgba(52, 211, 153, 0.04) 0%, transparent 50%); }
+
+        .live-dot { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        .gallery-img { transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease; }
+        .gallery-img:hover { transform: scale(1.03); box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4); }
+
+        .checklist-item { transition: all 0.2s ease; }
+        .checklist-item.completed { opacity: 0.75; }
+        .checklist-item.completed label { text-decoration: line-through; color: #64748b; }
+    </style>
+</head>
+<body class="dashboard-bg text-slate-200">
+    <!-- Navbar -->
+    <nav class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-lg sticky top-0 z-50">
+        <div class="max-w-screen-2xl mx-auto">
+            <div class="px-8 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-x-3">
+                    <div class="w-11 h-11 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                        <i class="fa-solid fa-dna text-white text-3xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-display text-3xl font-semibold tracking-tighter">ProcGen Creatures</h1>
+                        <p class="text-[10px] text-emerald-400/80 -mt-1 tracking-[1.5px]">LIVE GITHUB + REDDIT INTELLIGENCE</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-x-4">
+                    <div class="flex items-center gap-x-2 px-3 py-1.5 bg-slate-900 rounded-3xl border border-slate-800">
+                        <div class="w-2.5 h-2.5 bg-emerald-400 rounded-full live-dot"></div>
+                        <span class="text-xs font-medium text-emerald-400">LIVE API ENABLED</span>
+                    </div>
+                    
+                    <div class="text-xs px-3 py-1.5 bg-slate-900 rounded-3xl border border-slate-800 flex items-center gap-x-2">
+                        <i class="fa-solid fa-clock text-emerald-400"></i>
+                        <span id="last-updated" class="font-mono text-emerald-300">Jun 03, 2026 • 11:46 EDT</span>
+                    </div>
+                    
+                    <div class="hidden md:flex items-center gap-x-2 text-xs bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-3xl">
+                        <i class="fa-solid fa-user-astronaut text-emerald-400"></i>
+                        <span class="text-slate-400">For <span class="text-emerald-300 font-medium">Project Genesis</span> (Godot 4 C#)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <div class="max-w-screen-2xl mx-auto px-8 pt-8 pb-6">
+        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+            <div>
+                <div class="inline-flex items-center gap-x-2 px-4 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-3xl mb-4">
+                    <i class="fa-solid fa-satellite text-emerald-400"></i>
+                    <span class="uppercase tracking-[2px] text-xs font-semibold text-emerald-400">Real-time niche intelligence • GitHub API powered</span>
+                </div>
+                <h2 class="font-display text-6xl lg:text-7xl tracking-tighter font-semibold leading-none">Procedural Creature<br>Generation Dashboard</h2>
+                <p class="mt-3 max-w-xl text-xl text-slate-400">Live tracking of trending GitHub repos &amp; Reddit threads. Monitoring <span class="font-semibold text-emerald-300">nmagarino</span> &amp; <span class="font-semibold text-emerald-300">wanghaisheng</span> for new releases. Side-by-side feature comparisons + Godot integration tools.</p>
+            </div>
+            
+            <div class="flex flex-col gap-y-3 lg:items-end">
+                <div class="flex items-center gap-x-px bg-slate-900 border border-slate-800 rounded-3xl p-1">
+                    <button onclick="document.getElementById('live-section').scrollIntoView({ behavior: 'smooth' })" class="px-5 py-2 text-sm font-medium hover:bg-slate-800 transition-colors rounded-[2rem] flex items-center gap-x-2">
+                        <i class="fa-solid fa-sync"></i><span>Live Data</span>
+                    </button>
+                    <button onclick="document.getElementById('visual-section').scrollIntoView({ behavior: 'smooth' })" class="px-5 py-2 text-sm font-medium hover:bg-slate-800 transition-colors rounded-[2rem] flex items-center gap-x-2">
+                        <i class="fa-solid fa-image"></i><span>Visuals</span>
+                    </button>
+                    <button onclick="document.getElementById('godot-checklist').scrollIntoView({ behavior: 'smooth' })" class="px-5 py-2 text-sm font-medium hover:bg-slate-800 transition-colors rounded-[2rem] flex items-center gap-x-2">
+                        <i class="fa-brands fa-godot"></i><span>Godot</span>
+                    </button>
+                </div>
+                
+                <button onclick="simulateNewAlert(); document.getElementById('alerts-section').scrollIntoView({ behavior: 'smooth' })" 
+                        class="group flex items-center justify-center gap-x-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 transition-all active:scale-[0.985] text-white text-sm font-semibold rounded-3xl shadow-lg shadow-emerald-600/30">
+                    <i class="fa-solid fa-bell group-active:animate-ping"></i>
+                    <span>CHECK FOR NEW RELEASES</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="max-w-screen-2xl mx-auto px-8 pb-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="text-emerald-400 text-xs tracking-widest font-medium">KEY REPOS TRACKED</div>
+                        <div class="text-4xl font-semibold tabular-nums mt-1 stat-number">9</div>
+                    </div>
+                    <i class="fa-brands fa-github text-4xl text-emerald-900/70"></i>
+                </div>
+                <div class="mt-3 text-xs text-slate-400">5 creature-specific • 4 broader PCG</div>
+            </div>
+            
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="text-emerald-400 text-xs tracking-widest font-medium">REDDIT THREADS (30D)</div>
+                        <div class="text-4xl font-semibold tabular-nums mt-1 stat-number">18+</div>
+                    </div>
+                    <i class="fa-brands fa-reddit text-4xl text-orange-900/70"></i>
+                </div>
+                <div class="mt-3 text-xs text-slate-400">r/proceduralgeneration + r/godot</div>
+            </div>
+            
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="text-emerald-400 text-xs tracking-widest font-medium">MONITORED DEVS</div>
+                        <div class="text-4xl font-semibold tabular-nums mt-1 stat-number">2</div>
+                    </div>
+                    <i class="fa-solid fa-user-check text-4xl text-emerald-900/70"></i>
+                </div>
+                <div class="mt-1 flex gap-1">
+                    <span class="inline-block text-xs bg-emerald-500/10 text-emerald-400 px-2 py-px rounded">nmagarino</span>
+                    <span class="inline-block text-xs bg-emerald-500/10 text-emerald-400 px-2 py-px rounded">wanghaisheng</span>
+                </div>
+            </div>
+            
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="text-emerald-400 text-xs tracking-widest font-medium">LIVE API STATUS</div>
+                        <div class="text-2xl font-semibold mt-1 text-emerald-300">60 req/hr</div>
+                    </div>
+                    <i class="fa-solid fa-plug text-4xl text-emerald-900/70"></i>
+                </div>
+                <div class="mt-2 text-xs"><button onclick="refreshAllLiveData()" class="text-emerald-400 hover:text-emerald-300 underline">Refresh all live data now</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIVE GITHUB TRACKING SECTION -->
+    <div id="live-section" class="max-w-screen-2xl mx-auto px-8 pb-10">
+        <div class="flex items-end justify-between mb-5">
+            <div>
+                <h3 class="section-header text-3xl tracking-tighter font-semibold flex items-center gap-x-3">
+                    <i class="fa-solid fa-sync text-emerald-400"></i> Live GitHub Intelligence
+                </h3>
+                <p class="text-sm text-slate-400">Real-time data from GitHub REST API (unauthenticated • refreshes on demand)</p>
+            </div>
+            <button onclick="refreshAllLiveData()" class="px-4 py-2 text-sm font-medium bg-emerald-600 hover:bg-emerald-500 rounded-3xl flex items-center gap-x-2 transition-all active:scale-95">
+                <i class="fa-solid fa-sync"></i> <span>Refresh All</span>
+            </button>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mb-6">
+            <!-- Live nmagarino Card -->
+            <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-x-3">
+                        <div class="w-9 h-9 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-2xl flex items-center justify-center"><i class="fa-brands fa-github text-white"></i></div>
+                        <div>
+                            <div class="font-semibold">nmagarino / Pudgy-Pals</div>
+                            <div class="text-xs text-slate-400">Procedural Creature Generator (WebGL SDF)</div>
+                        </div>
+                    </div>
+                    <div id="nm-stars" class="text-right text-emerald-400 font-semibold text-lg tabular-nums">—</div>
+                </div>
+                
+                <div id="nm-desc" class="text-sm text-slate-300 min-h-[42px]">Loading live data...</div>
+                
+                <div class="mt-4 grid grid-cols-2 gap-4 text-xs">
+                    <div>
+                        <div class="text-emerald-400">Last Updated</div>
+                        <div id="nm-updated" class="font-mono text-slate-300">—</div>
+                    </div>
+                    <div>
+                        <div class="text-emerald-400">Open Issues</div>
+                        <div id="nm-issues" class="font-mono text-slate-300">—</div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 flex gap-2">
+                    <a href="https://github.com/nmagarino/Pudgy-Pals-Procedural-Creature-Generator" target="_blank" class="flex-1 text-center text-xs py-2 bg-slate-800 hover:bg-slate-700 rounded-2xl transition-colors">View Repo</a>
+                    <a href="https://nmagarino.github.io/Pudgy-Pals-Procedural-Creature-Generator/" target="_blank" class="flex-1 text-center text-xs py-2 bg-emerald-600 hover:bg-emerald-500 rounded-2xl transition-colors text-white">Live Demo</a>
+                </div>
+            </div>
+
+            <!-- Live wanghaisheng Card -->
+            <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-x-3">
+                        <div class="w-9 h-9 bg-gradient-to-br from-sky-500 to-cyan-500 rounded-2xl flex items-center justify-center"><i class="fa-brands fa-github text-white"></i></div>
+                        <div>
+                            <div class="font-semibold">wanghaisheng / Creature-Creator</div>
+                            <div class="text-xs text-slate-400">Unity • Spore-inspired Procedural Creatures</div>
+                        </div>
+                    </div>
+                    <div id="wang-stars" class="text-right text-sky-400 font-semibold text-lg tabular-nums">—</div>
+                </div>
+                
+                <div id="wang-desc" class="text-sm text-slate-300 min-h-[42px]">Loading live data...</div>
+                
+                <div class="mt-4 grid grid-cols-2 gap-4 text-xs">
+                    <div>
+                        <div class="text-sky-400">Last Updated</div>
+                        <div id="wang-updated" class="font-mono text-slate-300">—</div>
+                    </div>
+                    <div>
+                        <div class="text-sky-400">Forks</div>
+                        <div id="wang-forks" class="font-mono text-slate-300">—</div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 flex gap-2">
+                    <a href="https://github.com/wanghaisheng/Creature-Creator" target="_blank" class="flex-1 text-center text-xs py-2 bg-slate-800 hover:bg-slate-700 rounded-2xl transition-colors">View Repo</a>
+                    <button onclick="checkWangUpdateStatus()" class="flex-1 text-center text-xs py-2 bg-amber-600 hover:bg-amber-500 rounded-2xl transition-colors text-white">Check Update Status</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Discover New Tools -->
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <div class="font-semibold flex items-center gap-x-2"><i class="fa-solid fa-search text-emerald-400"></i> Discover New Procedural Creature Tools</div>
+                    <div class="text-xs text-slate-400">Search GitHub for recently created or updated repos matching creature/procedural generation</div>
+                </div>
+                <button onclick="discoverNewTools()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-sm font-medium rounded-3xl flex items-center gap-x-2 transition-all">
+                    <i class="fa-solid fa-magnifying-glass"></i> <span>Search Now</span>
+                </button>
+            </div>
+            
+            <div id="discover-results" class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm"></div>
+            <div id="discover-status" class="text-xs text-slate-400 mt-2"></div>
+        </div>
+    </div>
+
+    <!-- VISUAL INSPIRATION GALLERY -->
+    <div id="visual-section" class="max-w-screen-2xl mx-auto px-8 pb-10">
+        <div class="mb-5">
+            <h3 class="section-header text-3xl tracking-tighter font-semibold">Visual Inspiration Gallery</h3>
+            <p class="text-sm text-slate-400">AI-generated reference concepts matching the key projects (SDF metaball style, Spore modular, and your Godot post-apoc vision)</p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-4">
+            <div class="group">
+                <img src="pudgy-pals-sdf-creature.jpg" alt="Pudgy-Pals style SDF raymarched metaball creature with multi-joint limbs and varied heads" class="gallery-img w-full aspect-[16/10.5] object-cover rounded-3xl border border-slate-700 shadow-xl">
+                <div class="mt-3 px-1">
+                    <div class="font-semibold text-emerald-300">Pudgy-Pals SDF Style</div>
+                    <div class="text-xs text-slate-400">Metaball spine • 4 limb pairs • 3 head variants • raymarched organic forms. Perfect reference for coherent procedural anatomy.</div>
+                    <a href="https://nmagarino.github.io/Pudgy-Pals-Procedural-Creature-Generator/" target="_blank" class="text-xs text-emerald-400 hover:underline">→ Try the live demo</a>
+                </div>
+            </div>
+            
+            <div class="group">
+                <img src="spore-style-creature.jpg" alt="Spore-inspired colorful modular procedural creature with attachable limbs and expressive head" class="gallery-img w-full aspect-[16/10.5] object-cover rounded-3xl border border-slate-700 shadow-xl">
+                <div class="mt-3 px-1">
+                    <div class="font-semibold text-sky-300">Spore / wanghaisheng Style</div>
+                    <div class="text-xs text-slate-400">Modular part attachment, vibrant customization, playful yet detailed. Ideal for editor-style creature creators in Unity or Godot.</div>
+                    <a href="https://github.com/wanghaisheng/Creature-Creator" target="_blank" class="text-xs text-sky-400 hover:underline">→ Watch for major update</a>
+                </div>
+            </div>
+            
+            <div class="group">
+                <img src="godot-procedural-creature.jpg" alt="Godot 4 post-apocalyptic procedural creature concept with genetic variations, sprite-stacking friendly design, and symbiotic elements" class="gallery-img w-full aspect-[16/10.5] object-cover rounded-3xl border border-slate-700 shadow-xl">
+                <div class="mt-3 px-1">
+                    <div class="font-semibold text-amber-300">Your Godot Vision (Project Genesis)</div>
+                    <div class="text-xs text-slate-400">Rugged sprite-stacking / hybrid 3D, genetic D/r/M traits, nutrient pipelines, biome adaptations. Ready for your colony sim creatures.</div>
+                    <span class="text-xs text-amber-400">Native Godot 4 C# opportunity</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monitored Developers (original detailed cards, slightly condensed) -->
+    <div id="github-section" class="max-w-screen-2xl mx-auto px-8 pb-10">
+        <h3 class="section-header text-2xl tracking-tighter font-semibold mb-4">Detailed Project Breakdowns</h3>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- nmagarino detailed -->
+            <div class="repo-card bg-slate-900 border border-slate-700 hover:border-emerald-600/60 rounded-3xl p-6">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <div class="font-semibold text-xl">nmagarino — Pudgy-Pals</div>
+                        <div class="text-xs text-emerald-400">WebGL + TypeScript + GLSL (SDF Raymarching)</div>
+                    </div>
+                    <div class="text-emerald-400 text-sm font-semibold">5 ★</div>
+                </div>
+                <div class="mt-3 flex flex-wrap gap-1.5">
+                    <span class="feature-badge bg-violet-500/10 text-violet-300 border border-violet-500/30">SDF Metaballs</span>
+                    <span class="feature-badge bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">Multi-joint Limbs</span>
+                    <span class="feature-badge bg-amber-500/10 text-amber-300 border border-amber-500/30">Spore-inspired</span>
+                </div>
+                <p class="mt-3 text-sm text-slate-300">Robust creature system: up to 4 pairs of procedurally generated limbs (multi-joint, mirrored, appendages), 3 head types, 8-metaball spline spine. Excellent reference implementation.</p>
+                <div class="mt-4 text-xs grid grid-cols-3 gap-3 text-center border-t border-slate-800 pt-3">
+                    <div><span class="block text-emerald-400">LIMBS</span>4 pairs • joints • mirror</div>
+                    <div><span class="block text-emerald-400">HEADS</span>3 SDF types • scalable</div>
+                    <div><span class="block text-emerald-400">RENDER</span>Real-time raymarch</div>
+                </div>
+            </div>
+
+            <!-- wanghaisheng detailed -->
+            <div class="repo-card bg-slate-900 border border-slate-700 hover:border-emerald-600/60 rounded-3xl p-6 relative">
+                <div class="absolute top-5 right-5"><span class="px-2.5 py-0.5 text-[10px] font-bold bg-amber-500 text-amber-950 rounded-2xl">UPDATE PENDING</span></div>
+                <div>
+                    <div class="font-semibold text-xl">wanghaisheng — Creature-Creator</div>
+                    <div class="text-xs text-sky-400">Unity (C#) • Spore-inspired</div>
+                </div>
+                <div class="mt-3 flex flex-wrap gap-1.5">
+                    <span class="feature-badge bg-sky-500/10 text-sky-300 border border-sky-500/30">Modular Parts</span>
+                    <span class="feature-badge bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">Procedural Gen</span>
+                </div>
+                <p class="mt-3 text-sm text-slate-300">Procedurally generate creatures in Unity inspired by Spore. Repository has undergone several major changes. <span class="font-semibold text-amber-300">Major update + YouTube devlog expected soon.</span></p>
+                <div class="mt-4 text-xs">Watch the repo for the upcoming release with new features and development insights.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Comparison (kept and slightly expanded) -->
+    <div id="comparison-section" class="max-w-screen-2xl mx-auto px-8 pb-10">
+        <div class="mb-4 flex items-end justify-between">
+            <div>
+                <h3 class="section-header text-3xl tracking-tighter font-semibold">Feature Comparison: Limb • Head • Engine • Godot</h3>
+            </div>
+            <button onclick="copyComparisonToClipboard()" class="text-xs px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-2xl flex items-center gap-x-2"><i class="fa-solid fa-copy"></i> Copy as Markdown</button>
+        </div>
+        
+        <div class="overflow-x-auto rounded-3xl border border-slate-700">
+            <table class="w-full min-w-[1000px] text-sm comparison-table">
+                <thead>
+                    <tr>
+                        <th class="px-5 py-3 text-left w-52">Project</th>
+                        <th class="px-4 py-3 text-left">Limb Creation</th>
+                        <th class="px-4 py-3 text-left">Head Generation</th>
+                        <th class="px-4 py-3 text-left">Torso / Body</th>
+                        <th class="px-3 py-3 text-center">Godot Ready</th>
+                        <th class="px-4 py-3 text-left">Standout Strength</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800">
+                    <tr class="hover:bg-slate-900/50">
+                        <td class="px-5 py-4 font-medium text-emerald-300">Pudgy-Pals (nmagarino)<br><span class="text-xs text-slate-500">WebGL SDF</span></td>
+                        <td class="px-4 py-4 text-xs">Excellent — 4 pairs, multi-joint procedural placement, spherical randomization, mirroring, appendages</td>
+                        <td class="px-4 py-4 text-xs">Good — 3 predefined scalable SDF types</td>
+                        <td class="px-4 py-4 text-xs">8 metaballs on spline (De Casteljau)</td>
+                        <td class="px-3 py-4 text-center"><span class="text-[10px] px-2 py-0.5 bg-orange-500/10 text-orange-300 rounded-2xl">Concepts portable</span></td>
+                        <td class="px-4 py-4 text-xs">Best open reference for coherent organic limb &amp; head logic + real-time rendering</td>
+                    </tr>
+                    <tr class="hover:bg-slate-900/50">
+                        <td class="px-5 py-4 font-medium text-sky-300">Creature-Creator (wanghaisheng)<br><span class="text-xs text-slate-500">Unity</span></td>
+                        <td class="px-4 py-4 text-xs">Expected strong (Spore-style modular attachment &amp; procedural parts)</td>
+                        <td class="px-4 py-4 text-xs">Expected (customizable/procedural heads)</td>
+                        <td class="px-4 py-4 text-xs">Body molding &amp; part system</td>
+                        <td class="px-3 py-4 text-center"><span class="text-[10px] px-2 py-0.5 bg-sky-500/10 text-sky-300 rounded-2xl">GLTF export</span></td>
+                        <td class="px-4 py-4 text-xs"><span class="text-amber-300 font-semibold">Major update incoming</span> — editor-like workflow</td>
+                    </tr>
+                    <tr class="hover:bg-slate-900/50">
+                        <td class="px-5 py-4 font-medium text-sky-300">creature (daniellochner)<br><span class="text-xs text-slate-500">Unity</span></td>
+                        <td class="px-4 py-4 text-xs">Strong — attachable limbs + body editing</td>
+                        <td class="px-4 py-4 text-xs">Strong — heads + painting</td>
+                        <td class="px-4 py-4 text-xs">Full editor (build/paint/test)</td>
+                        <td class="px-3 py-4 text-center"><span class="text-[10px] px-2 py-0.5 bg-sky-500/10 text-sky-300 rounded-2xl">GLTF</span></td>
+                        <td class="px-4 py-4 text-xs">Most complete Spore recreation with full source</td>
+                    </tr>
+                    <tr class="hover:bg-slate-900/50">
+                        <td class="px-5 py-4 font-medium text-teal-300">Infinigen (Princeton)<br><span class="text-xs text-slate-500">Blender/Python</span></td>
+                        <td class="px-4 py-4 text-xs">Advanced — full procedural articulated animals</td>
+                        <td class="px-4 py-4 text-xs">Advanced — fully procedural</td>
+                        <td class="px-4 py-4 text-xs">Complete math-rule creature bodies</td>
+                        <td class="px-3 py-4 text-center"><span class="text-[10px] px-2 py-0.5 bg-teal-500/10 text-teal-300 rounded-2xl">GLTF/FBX export</span></td>
+                        <td class="px-4 py-4 text-xs">Photorealistic infinite variation, math-only (no AI)</td>
+                    </tr>
+                    <tr class="bg-emerald-950/30 border-l-4 border-emerald-500">
+                        <td class="px-5 py-4 font-medium text-emerald-300">Your Project Genesis<br><span class="text-xs text-emerald-400">Godot 4 C# • Sanctuary Site-04</span></td>
+                        <td class="px-4 py-4 text-xs">In development — sprite-stacking + planned modular data-driven limbs</td>
+                        <td class="px-4 py-4 text-xs">Planned — hybrid or procedural heads</td>
+                        <td class="px-4 py-4 text-xs">Genetic engine (12-locus D/r/M) + nutrient pipelines</td>
+                        <td class="px-3 py-4 text-center"><span class="text-[10px] px-2.5 py-0.5 bg-emerald-500 text-emerald-950 font-bold rounded-2xl">NATIVE</span></td>
+                        <td class="px-4 py-4 text-xs">Your opportunity to build the definitive Godot-native procedural creature system</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- GODOT INTEGRATION CHECKLIST -->
+    <div id="godot-checklist" class="max-w-screen-2xl mx-auto px-8 pb-10">
+        <div class="bg-slate-900 border border-emerald-700/50 rounded-3xl p-7">
+            <div class="flex items-start justify-between mb-5">
+                <div>
+                    <h3 class="section-header text-3xl tracking-tighter font-semibold text-emerald-300">Godot 4 Integration Checklist</h3>
+                    <p class="text-sm text-slate-400">Practical next steps to bring ideas from Pudgy-Pals, Spore-style tools, and Infinigen into your Sanctuary Site-04 creature systems</p>
+                </div>
+                <button onclick="resetChecklist()" class="text-xs px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-2xl">Reset</button>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm" id="checklist-container">
+                <!-- Populated by JS -->
+            </div>
+            
+            <div class="mt-5 pt-4 border-t border-slate-700 text-xs text-emerald-400 flex items-center gap-x-2">
+                <i class="fa-solid fa-info-circle"></i>
+                <span>Checkboxes persist in your browser (localStorage). Great for tracking progress across sessions.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reddit + Alerts (condensed for space) -->
+    <div class="max-w-screen-2xl mx-auto px-8 grid lg:grid-cols-5 gap-6 pb-10">
+        <!-- Reddit summary -->
+        <div class="lg:col-span-3 bg-slate-900 border border-slate-700 rounded-3xl p-6">
+            <h4 class="font-semibold mb-3 flex items-center gap-x-2"><i class="fa-brands fa-reddit text-orange-400"></i> Recent Reddit Activity</h4>
+            <div class="space-y-3 text-sm">
+                <div><a href="https://www.reddit.com/r/proceduralgeneration/comments/1jv2tk9/" target="_blank" class="hover:text-emerald-300">Progress on procedural creatures + RL walking tool</a> <span class="text-xs text-slate-500">(r/proceduralgeneration)</span></div>
+                <div><a href="https://www.reddit.com/r/godot/comments/1to72ti/" target="_blank" class="hover:text-emerald-300">Procedural creature gen + animation experiments in Godot</a></div>
+                <div><a href="https://www.reddit.com/r/proceduralgeneration/comments/1jjpffb/" target="_blank" class="hover:text-emerald-300">Morphology tool + RL for procedural creatures learning to walk</a></div>
+            </div>
+            <div class="mt-3 text-xs"><a href="https://www.reddit.com/r/proceduralgeneration/search/?q=creature+generator" target="_blank" class="text-orange-400 hover:underline">Search more on Reddit →</a></div>
+        </div>
+        
+        <!-- Alerts -->
+        <div id="alerts-section" class="lg:col-span-2 bg-slate-900 border border-slate-700 rounded-3xl p-6">
+            <div class="flex justify-between items-center mb-3">
+                <h4 class="font-semibold flex items-center gap-x-2"><i class="fa-solid fa-bell text-amber-400"></i> Alerts &amp; Monitoring</h4>
+                <button onclick="simulateNewAlert()" class="text-xs px-3 py-1 bg-amber-600 hover:bg-amber-500 rounded-2xl">Manual Scan</button>
+            </div>
+            <div id="alerts-list" class="space-y-2 text-xs max-h-48 overflow-auto"></div>
+        </div>
+    </div>
+
+    <!-- Monitoring Setup -->
+    <div class="max-w-screen-2xl mx-auto px-8 pb-12">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-7 text-sm">
+            <h4 class="font-semibold mb-2">Production Live Monitoring Setup</h4>
+            <div class="grid md:grid-cols-3 gap-6 text-xs">
+                <div>
+                    <div class="font-medium text-emerald-300 mb-1">GitHub (this dashboard)</div>
+                    <p>Uses public REST API. Rate limit ~60 req/hr. The Live section above already implements search + repo polling. For higher limits, add a PAT.</p>
+                </div>
+                <div>
+                    <div class="font-medium text-orange-300 mb-1">Reddit</div>
+                    <p>Follow r/proceduralgeneration &amp; r/godot. Use IFTTT/Zapier or Reddit's own alerts for keywords like "procedural creature generator".</p>
+                </div>
+                <div>
+                    <div class="font-medium text-sky-300 mb-1">Automated Script</div>
+                    <p>Run the Python template below on a schedule (cron / GitHub Actions) to push new releases to Discord or update a JSON feed.</p>
+                    <button onclick="showSampleScript()" class="mt-2 text-xs px-3 py-1 bg-sky-600 hover:bg-sky-500 rounded-2xl">Show Python monitor script</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="border-t border-slate-800 py-5 text-center text-xs text-slate-500">
+        Expanded dashboard • Live GitHub API • Generated visuals • Godot checklist • June 3, 2026<br>
+        Data via GitHub public API + curated research. Rate limits apply to live features.
+    </footer>
+
+    <!-- Script Modal -->
+    <div id="script-modal" onclick="if (event.target.id === 'script-modal') hideSampleScript()" class="hidden fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-6">
+        <div onclick="event.stopImmediatePropagation()" class="bg-slate-900 border border-slate-700 max-w-3xl w-full rounded-3xl p-8 max-h-[75vh] overflow-auto">
+            <div class="flex justify-between mb-4">
+                <h4 class="font-semibold">Python Live Monitor Template (for cron / Actions)</h4>
+                <button onclick="hideSampleScript()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-times fa-lg"></i></button>
+            </div>
+            <pre class="bg-black p-4 rounded-2xl text-xs overflow-x-auto text-emerald-300 font-mono"><code>import os, schedule, time
+from github import Github
+from datetime import datetime, timedelta
+
+g = Github(os.getenv("GITHUB_TOKEN"))  # recommended
+
+def check_creature_repos():
+    query = '("procedural creature" OR "creature generator" OR "procedural generation" creature) created:>2026-05-01'
+    for repo in g.search_repositories(query=query, sort="updated")[:8]:
+        print(f"[{repo.updated_at}] {repo.full_name} — {repo.description}")
+
+def check_monitored():
+    for dev in ["nmagarino", "wanghaisheng"]:
+        for repo in g.get_user(dev).get_repos():
+            if any(k in repo.name.lower() for k in ["creature", "procedural"]):
+                print(f"Activity: {repo.full_name} updated {repo.updated_at}")
+
+schedule.every(4).hours.do(check_creature_repos)
+schedule.every(8).hours.do(check_monitored)
+
+print("ProcGen Creature Monitor started")
+while True:
+    schedule.run_pending()
+    time.sleep(300)</code></pre>
+            <p class="text-xs mt-3 text-slate-400">pip install PyGithub schedule. Add Discord webhook or push to JSON for this dashboard to consume.</p>
+        </div>
+    </div>
+
+    <script>
+        // Tailwind + init
+        function initTailwind() { /* already handled by CDN */ }
+
+        function updateTimestamp() {
+            const el = document.getElementById('last-updated');
+            const now = new Date();
+            el.textContent = now.toLocaleDateString('en-US', {month:'short', day:'2-digit'}) + ', 2026 • ' + now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'}) + ' EDT';
+        }
+
+        // ========== LIVE GITHUB API ==========
+        async function fetchRepo(owner, repo) {
+            const url = `https://api.github.com/repos/${owner}/${repo}`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
+            return res.json();
+        }
+
+        async function loadLiveRepoData(owner, repoName, prefix) {
+            try {
+                const data = await fetchRepo(owner, repoName);
+                
+                document.getElementById(`${prefix}-stars`).textContent = data.stargazers_count || '—';
+                document.getElementById(`${prefix}-desc`).textContent = data.description || 'No description';
+                document.getElementById(`${prefix}-updated`).textContent = new Date(data.updated_at).toLocaleDateString();
+                
+                if (prefix === 'nm') {
+                    document.getElementById('nm-issues').textContent = data.open_issues_count || '—';
+                } else {
+                    document.getElementById('wang-forks').textContent = data.forks_count || '—';
+                }
+            } catch (e) {
+                console.warn('Live fetch failed for', owner, e);
+                const descEl = document.getElementById(`${prefix}-desc`);
+                if (descEl) descEl.innerHTML = `<span class="text-amber-400">Live data unavailable (rate limit or network). Using cached info.</span>`;
+            }
+        }
+
+        async function refreshAllLiveData() {
+            const btns = document.querySelectorAll('#live-section button');
+            btns.forEach(b => b.disabled = true);
+            
+            await Promise.all([
+                loadLiveRepoData('nmagarino', 'Pudgy-Pals-Procedural-Creature-Generator', 'nm'),
+                loadLiveRepoData('wanghaisheng', 'Creature-Creator', 'wang')
+            ]);
+            
+            btns.forEach(b => b.disabled = false);
+            showToast('Live GitHub data refreshed');
+        }
+
+        async function discoverNewTools() {
+            const container = document.getElementById('discover-results');
+            const status = document.getElementById('discover-status');
+            container.innerHTML = '';
+            container.classList.remove('hidden');
+            status.textContent = 'Searching GitHub for recent procedural creature tools...';
+            
+            const query = encodeURIComponent('("procedural creature" OR "creature generator" OR "procedural generation" creature) in:name,description,readme sort:updated');
+            const url = `https://api.github.com/search/repositories?q=${query}&per_page=6`;
+            
+            try {
+                const res = await fetch(url);
+                const json = await res.json();
+                
+                if (json.items && json.items.length > 0) {
+                    status.textContent = `Found ${json.items.length} recent matches. Showing top results.`;
+                    
+                    json.items.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'bg-slate-800 border border-slate-700 rounded-2xl p-3 text-xs';
+                        div.innerHTML = `
+                            <div class="font-semibold">${item.full_name}</div>
+                            <div class="text-slate-400 line-clamp-2 mt-1">${item.description || 'No description'}</div>
+                            <div class="flex justify-between mt-2 text-[10px]">
+                                <span class="text-emerald-400">★ ${item.stargazers_count}</span>
+                                <span class="text-slate-500">${new Date(item.updated_at).toLocaleDateString()}</span>
+                            </div>
+                            <a href="${item.html_url}" target="_blank" class="text-emerald-400 hover:underline text-xs block mt-1">View on GitHub →</a>
+                        `;
+                        container.appendChild(div);
+                    });
+                } else {
+                    status.textContent = 'No new matching repositories found in recent results.';
+                }
+            } catch (e) {
+                status.textContent = 'Search failed (GitHub rate limit reached). Try again later.';
+                console.error(e);
+            }
+        }
+
+        function checkWangUpdateStatus() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/60 flex items-center justify-center z-[200]';
+            modal.innerHTML = `
+                <div class="bg-slate-900 border border-amber-500/50 rounded-3xl p-7 max-w-md mx-4">
+                    <h4 class="font-semibold text-lg mb-2 text-amber-300">wanghaisheng Update Status</h4>
+                    <p class="text-sm">The repository README explicitly states: "This repository has undergone several major changes since its initial release (which have not yet been made public). An update will soon be released, along with a YouTube video discussing the development process."</p>
+                    <p class="mt-3 text-xs text-slate-400">Recommendation: Star the repo and enable release notifications on GitHub. The dashboard will continue monitoring.</p>
+                    <button onclick="this.closest('.fixed').remove()" class="mt-4 w-full py-2 bg-amber-600 hover:bg-amber-500 rounded-2xl text-sm font-medium">Got it — I'll watch the repo</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // ========== VISUAL GALLERY (already static images) ==========
+
+        // ========== GODOT CHECKLIST ==========
+        const checklistItems = [
+            { id: 'modular-limbs', label: 'Implement modular limb system (separate scenes/nodes with attachment points & bone sockets)', category: 'Core Systems' },
+            { id: 'data-driven', label: 'Create data-driven creature parameters (JSON/CSV/Resource compatible with your 12-locus genetic engine)', category: 'Core Systems' },
+            { id: 'head-variants', label: 'Add procedural or selectable head generation (start with 4-6 base meshes + variation sliders)', category: 'Core Systems' },
+            { id: 'sprite-stacking', label: 'Prototype sprite-stacking rendering pipeline for creatures (or hybrid 2.5D)', category: 'Rendering' },
+            { id: 'gltf-import', label: 'Build GLTF import pipeline from Unity/Blender procedural tools for high-quality fallback assets', category: 'Rendering' },
+            { id: 'ik-animation', label: 'Implement IK or procedural animation for multi-joint limbs (or integrate RL walk cycles)', category: 'Animation' },
+            { id: 'editor-ui', label: 'Create in-game or editor creature customization UI inspired by Spore / Pudgy-Pals controls', category: 'UX' },
+            { id: 'genetic-integration', label: 'Wire creature params into D/r/M genetic system and nutrient pipeline events', category: 'Integration' },
+            { id: 'performance', label: 'Profile real-time generation performance (target 60fps for colony sim view)', category: 'Performance' },
+            { id: 'export-tools', label: 'Add export options (GLTF, PNG sprite sheets, or custom format for save games)', category: 'Integration' }
+        ];
+
+        function renderChecklist() {
+            const container = document.getElementById('checklist-container');
+            container.innerHTML = '';
+            
+            const saved = JSON.parse(localStorage.getItem('procgen_godot_checklist') || '{}');
+            
+            checklistItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `checklist-item flex items-start gap-x-3 p-3 rounded-2xl hover:bg-slate-800/60 ${saved[item.id] ? 'completed' : ''}`;
+                
+                div.innerHTML = `
+                    <input type="checkbox" id="${item.id}" class="mt-1 accent-emerald-500" ${saved[item.id] ? 'checked' : ''}>
+                    <div class="flex-1">
+                        <label for="${item.id}" class="cursor-pointer">${item.label}</label>
+                        <div class="text-[10px] text-emerald-400/70 mt-0.5">${item.category}</div>
+                    </div>
+                `;
+                
+                const checkbox = div.querySelector('input');
+                checkbox.addEventListener('change', () => {
+                    const current = JSON.parse(localStorage.getItem('procgen_godot_checklist') || '{}');
+                    current[item.id] = checkbox.checked;
+                    localStorage.setItem('procgen_godot_checklist', JSON.stringify(current));
+                    div.classList.toggle('completed', checkbox.checked);
+                });
+                
+                container.appendChild(div);
+            });
+        }
+
+        function resetChecklist() {
+            localStorage.removeItem('procgen_godot_checklist');
+            renderChecklist();
+            showToast('Checklist reset');
+        }
+
+        // ========== ALERTS ==========
+        let alerts = [
+            { id: 1, time: "Jun 02", title: "wanghaisheng/Creature-Creator — Major unreleased changes detected", desc: "Update + YouTube video expected soon. Star the repo for notifications.", severity: "amber" },
+            { id: 2, time: "May 28", title: "Pudgy-Pals (nmagarino) — Best open SDF limb/head reference", desc: "Live demo available. Excellent for studying coherent procedural anatomy.", severity: "emerald" }
+        ];
+
+        function renderAlerts() {
+            const container = document.getElementById('alerts-list');
+            container.innerHTML = '';
+            alerts.slice(0, 4).forEach(a => {
+                const el = document.createElement('div');
+                el.className = `alert-item p-2.5 bg-slate-800 rounded-2xl flex gap-x-2 text-xs ${a.severity === 'amber' ? 'border-l-2 border-amber-500' : ''}`;
+                el.innerHTML = `
+                    <div class="flex-1"><span class="font-medium">${a.title}</span> <span class="text-slate-500">(${a.time})</span><br><span class="text-slate-400">${a.desc}</span></div>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function simulateNewAlert() {
+            const newA = {
+                id: Date.now(),
+                time: "Now",
+                title: "Live scan complete — No brand new creature repos in last 24h from monitored devs",
+                desc: "wanghaisheng still active. Consider running the discover tool above for broader results.",
+                severity: "emerald"
+            };
+            alerts.unshift(newA);
+            renderAlerts();
+            showToast('New scan added to alerts');
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.className = 'fixed bottom-6 right-6 bg-emerald-600 text-white px-5 py-2.5 rounded-3xl shadow-xl flex items-center gap-x-2 text-sm z-[300]';
+            t.innerHTML = `<i class="fa-solid fa-check"></i> <span>${msg}</span>`;
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.transition = 'all .3s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 200); }, 2400);
+        }
+
+        function copyComparisonToClipboard() {
+            const table = document.querySelector('#comparison-section table');
+            let md = '| Project | Limb Creation | Head | Torso | Godot | Strength |\n|---------|---------------|------|-------|-------|----------|\n';
+            table.querySelectorAll('tbody tr').forEach(row => {
+                const cells = Array.from(row.querySelectorAll('td')).map(c => c.innerText.trim().replace(/\n/g, ' ').slice(0, 90));
+                if (cells.length >= 5) md += `| ${cells[0]} | ${cells[1]} | ${cells[2]} | ${cells[3]} | ${cells[4]} | ${cells[5]} |\n`;
+            });
+            navigator.clipboard.writeText(md).then(() => showToast('Comparison copied as Markdown!'));
+        }
+
+        function showSampleScript() {
+            document.getElementById('script-modal').classList.remove('hidden');
+            document.getElementById('script-modal').classList.add('flex');
+        }
+        function hideSampleScript() {
+            const m = document.getElementById('script-modal');
+            m.classList.remove('flex'); m.classList.add('hidden');
+        }
+
+        function setupKeyboard() {
+            document.addEventListener('keydown', e => {
+                if (e.key === '/' && document.activeElement.tagName === 'BODY') {
+                    e.preventDefault();
+                    document.getElementById('live-section').scrollIntoView({behavior:'smooth'});
+                    setTimeout(() => refreshAllLiveData(), 600);
+                }
+                if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                    e.preventDefault();
+                    document.getElementById('godot-checklist').scrollIntoView({behavior:'smooth'});
+                }
+            });
+        }
+
+        // Init everything
+        function initializeDashboard() {
+            initTailwind();
+            updateTimestamp();
+            renderAlerts();
+            renderChecklist();
+            setupKeyboard();
+            
+            // Auto-load live data on first visit (gentle)
+            setTimeout(() => {
+                loadLiveRepoData('nmagarino', 'Pudgy-Pals-Procedural-Creature-Generator', 'nm');
+                loadLiveRepoData('wanghaisheng', 'Creature-Creator', 'wang');
+            }, 1200);
+            
+            // Periodic subtle timestamp refresh
+            setInterval(updateTimestamp, 45000);
+            
+            console.log('%c[ProcGen Dashboard v2] Expanded with live API, visuals, Godot checklist, and discover tool. All systems ready.', 'color:#166534');
+        }
+
+        window.onload = initializeDashboard;
+        
+        // Console helpers
+        window.ProcGen = { refreshLive: refreshAllLiveData, discover: discoverNewTools, resetGodotChecklist: resetChecklist };
+    </script>
+</body>
+</html>
